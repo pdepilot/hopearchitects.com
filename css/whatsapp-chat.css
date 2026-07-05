@@ -1,0 +1,477 @@
+/*** WhatsApp Live Chat — 3D Widget ***/
+.wa-live-chat {
+    --wa-green: #25d366;
+    --wa-green-dark: #128c7e;
+    --wa-gold: #C9A227;
+    --wa-brand: #1B5E3B;
+    --wa-shadow: rgba(18, 140, 126, 0.45);
+    position: fixed;
+    right: 24px;
+    bottom: 24px;
+    z-index: 9999;
+    font-family: "Open Sans", sans-serif;
+    pointer-events: none;
+}
+
+.wa-live-chat * {
+    box-sizing: border-box;
+}
+
+.wa-live-chat > * {
+    pointer-events: auto;
+}
+
+/* Chat panel */
+.wa-chat-panel {
+    position: absolute;
+    right: 0;
+    bottom: 88px;
+    width: min(340px, calc(100vw - 48px));
+    opacity: 0;
+    visibility: hidden;
+    transform: perspective(900px) rotateX(18deg) rotateY(-6deg) translateY(24px) scale(0.88);
+    transform-origin: 90% 100%;
+    transition:
+        opacity 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+        transform 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+        visibility 0.45s;
+}
+
+.wa-chat-panel.is-open {
+    opacity: 1;
+    visibility: visible;
+    transform: perspective(900px) rotateX(0deg) rotateY(0deg) translateY(0) scale(1);
+}
+
+.wa-chat-card {
+    overflow: hidden;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    box-shadow:
+        0 24px 60px rgba(0, 0, 0, 0.18),
+        0 8px 24px rgba(27, 94, 59, 0.12),
+        inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.65);
+}
+
+.wa-chat-header {
+    position: relative;
+    padding: 18px 18px 16px;
+    color: #fff;
+    background: linear-gradient(135deg, var(--wa-brand) 0%, var(--wa-green-dark) 55%, var(--wa-green) 100%);
+    overflow: hidden;
+}
+
+.wa-chat-header::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(120deg, transparent 30%, rgba(255, 255, 255, 0.18) 50%, transparent 70%);
+    transform: translateX(-120%);
+    animation: waShimmer 4s ease-in-out infinite;
+}
+
+.wa-chat-close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 30px;
+    height: 30px;
+    border: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.18);
+    color: #fff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.25s ease, background 0.25s ease;
+    z-index: 2;
+}
+
+.wa-chat-close:hover {
+    transform: rotate(90deg) scale(1.08);
+    background: rgba(255, 255, 255, 0.28);
+}
+
+.wa-chat-agent {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    position: relative;
+    z-index: 1;
+}
+
+.wa-chat-avatar {
+    position: relative;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: linear-gradient(145deg, #fff 0%, #e8f5ee 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow:
+        0 8px 20px rgba(0, 0, 0, 0.15),
+        inset 0 -3px 8px rgba(27, 94, 59, 0.12);
+    transform: translateZ(12px);
+}
+
+.wa-chat-avatar i {
+    font-size: 26px;
+    color: var(--wa-green);
+}
+
+.wa-chat-status-dot {
+    position: absolute;
+    right: 2px;
+    bottom: 2px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #4ade80;
+    border: 2px solid #fff;
+    box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.7);
+    animation: waPulseDot 2s ease-out infinite;
+}
+
+.wa-chat-meta h4 {
+    margin: 0 0 4px;
+    font-size: 1.05rem;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+}
+
+.wa-chat-meta p {
+    margin: 0;
+    font-size: 0.78rem;
+    opacity: 0.92;
+}
+
+.wa-chat-body {
+    padding: 16px 18px 8px;
+    background: linear-gradient(180deg, #f7faf8 0%, #fff 100%);
+}
+
+.wa-chat-bubble {
+    position: relative;
+    max-width: 92%;
+    padding: 12px 14px;
+    margin-bottom: 10px;
+    border-radius: 16px 16px 16px 4px;
+    background: #fff;
+    color: #2d3748;
+    font-size: 0.88rem;
+    line-height: 1.55;
+    box-shadow:
+        0 10px 24px rgba(27, 94, 59, 0.08),
+        0 2px 6px rgba(0, 0, 0, 0.04);
+    transform: translateZ(8px);
+    animation: waBubbleIn 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.15s both;
+}
+
+.wa-chat-bubble::after {
+    content: "";
+    position: absolute;
+    left: -6px;
+    bottom: 10px;
+    width: 12px;
+    height: 12px;
+    background: #fff;
+    transform: rotate(45deg);
+    box-shadow: -2px 2px 4px rgba(0, 0, 0, 0.03);
+}
+
+.wa-chat-typing {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 2px;
+    padding-left: 2px;
+}
+
+.wa-chat-typing span {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--wa-brand);
+    opacity: 0.35;
+    animation: waTyping 1.2s ease-in-out infinite;
+}
+
+.wa-chat-typing span:nth-child(2) { animation-delay: 0.15s; }
+.wa-chat-typing span:nth-child(3) { animation-delay: 0.3s; }
+
+.wa-chat-footer {
+    padding: 0 18px 18px;
+    background: #fff;
+}
+
+.wa-chat-cta {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    padding: 14px 18px;
+    border: 0;
+    border-radius: 14px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #fff;
+    text-decoration: none;
+    cursor: pointer;
+    background: linear-gradient(135deg, var(--wa-green) 0%, var(--wa-green-dark) 100%);
+    box-shadow:
+        0 14px 28px var(--wa-shadow),
+        inset 0 1px 0 rgba(255, 255, 255, 0.25),
+        inset 0 -3px 8px rgba(0, 0, 0, 0.08);
+    transform: translateZ(0);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.wa-chat-cta:hover {
+    color: #fff;
+    transform: translateY(-2px) scale(1.02);
+    box-shadow:
+        0 18px 36px var(--wa-shadow),
+        inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+
+.wa-chat-cta:active {
+    transform: translateY(0) scale(0.98);
+}
+
+.wa-chat-cta i {
+    font-size: 1.2rem;
+}
+
+/* 3D floating button scene */
+.wa-float-scene {
+    position: relative;
+    width: 68px;
+    height: 68px;
+    perspective: 900px;
+}
+
+.wa-float-ring {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 2px solid rgba(37, 211, 102, 0.45);
+    animation: waRing 2.8s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+    pointer-events: none;
+}
+
+.wa-float-ring--2 {
+    animation-delay: 1.4s;
+}
+
+.wa-float-btn {
+    position: relative;
+    width: 68px;
+    height: 68px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    cursor: pointer;
+    background: transparent;
+    transform-style: preserve-3d;
+    animation: waFloat3d 5s ease-in-out infinite;
+    transition: transform 0.15s ease-out;
+}
+
+.wa-float-btn__body {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: linear-gradient(145deg, #3ee07a 0%, var(--wa-green) 35%, var(--wa-green-dark) 100%);
+    box-shadow:
+        0 16px 32px var(--wa-shadow),
+        0 6px 12px rgba(0, 0, 0, 0.12),
+        inset 0 2px 4px rgba(255, 255, 255, 0.35),
+        inset 0 -6px 14px rgba(0, 0, 0, 0.12);
+    transform: translateZ(18px);
+}
+
+.wa-float-btn__icon {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 34px;
+    color: #fff;
+    transform: translateZ(28px);
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+.wa-float-btn__shine {
+    position: absolute;
+    inset: 4px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.55) 0%, transparent 45%);
+    transform: translateZ(24px);
+    pointer-events: none;
+}
+
+.wa-float-btn__shadow {
+    position: absolute;
+    left: 50%;
+    bottom: -8px;
+    width: 52px;
+    height: 12px;
+    margin-left: -26px;
+    border-radius: 50%;
+    background: radial-gradient(ellipse, rgba(18, 140, 126, 0.45) 0%, transparent 72%);
+    transform: translateZ(-8px) rotateX(75deg);
+    animation: waShadowPulse 5s ease-in-out infinite;
+}
+
+.wa-float-badge {
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    min-width: 22px;
+    height: 22px;
+    padding: 0 6px;
+    border-radius: 999px;
+    background: linear-gradient(135deg, var(--wa-gold) 0%, #ddb52e 100%);
+    color: #1a1a1a;
+    font-size: 0.68rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(201, 162, 39, 0.45);
+    transform: translateZ(32px);
+    animation: waBadgePop 0.6s cubic-bezier(0.22, 1, 0.36, 1) 1.2s both;
+}
+
+.wa-float-tooltip {
+    position: absolute;
+    right: calc(100% + 14px);
+    top: 50%;
+    transform: translateY(-50%) translateX(8px) scale(0.92);
+    opacity: 0;
+    visibility: hidden;
+    white-space: nowrap;
+    padding: 10px 14px;
+    border-radius: 12px;
+    background: rgba(26, 26, 26, 0.92);
+    color: #fff;
+    font-size: 0.82rem;
+    font-weight: 500;
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.18);
+    transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s;
+    pointer-events: none;
+}
+
+.wa-float-tooltip::after {
+    content: "";
+    position: absolute;
+    right: -6px;
+    top: 50%;
+    width: 12px;
+    height: 12px;
+    margin-top: -6px;
+    background: rgba(26, 26, 26, 0.92);
+    transform: rotate(45deg);
+}
+
+.wa-float-scene:hover .wa-float-tooltip,
+.wa-live-chat.is-idle .wa-float-tooltip {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(-50%) translateX(0) scale(1);
+}
+
+.wa-live-chat.is-open .wa-float-tooltip {
+    opacity: 0;
+    visibility: hidden;
+}
+
+/* Stack above back-to-top */
+body:has(.wa-live-chat) .back-to-top {
+    bottom: 100px;
+}
+
+@keyframes waFloat3d {
+    0%, 100% { transform: translateY(0) rotateX(10deg) rotateY(-10deg); }
+    50% { transform: translateY(-10px) rotateX(-6deg) rotateY(8deg); }
+}
+
+@keyframes waRing {
+    0% { transform: scale(0.85); opacity: 0.75; }
+    100% { transform: scale(1.55); opacity: 0; }
+}
+
+@keyframes waShadowPulse {
+    0%, 100% { transform: translateZ(-8px) rotateX(75deg) scale(1); opacity: 0.7; }
+    50% { transform: translateZ(-8px) rotateX(75deg) scale(0.82); opacity: 0.45; }
+}
+
+@keyframes waPulseDot {
+    0% { box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.65); }
+    70% { box-shadow: 0 0 0 8px rgba(74, 222, 128, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(74, 222, 128, 0); }
+}
+
+@keyframes waTyping {
+    0%, 60%, 100% { transform: translateY(0); opacity: 0.35; }
+    30% { transform: translateY(-4px); opacity: 1; }
+}
+
+@keyframes waBubbleIn {
+    from { opacity: 0; transform: translateY(12px) translateZ(0); }
+    to { opacity: 1; transform: translateY(0) translateZ(8px); }
+}
+
+@keyframes waShimmer {
+    0%, 100% { transform: translateX(-120%); }
+    50% { transform: translateX(120%); }
+}
+
+@keyframes waBadgePop {
+    from { transform: translateZ(32px) scale(0); }
+    to { transform: translateZ(32px) scale(1); }
+}
+
+@media (max-width: 576px) {
+    .wa-live-chat {
+        right: 16px;
+        bottom: 16px;
+    }
+
+    .wa-chat-panel {
+        bottom: 82px;
+        width: calc(100vw - 32px);
+    }
+
+    .wa-float-tooltip {
+        display: none;
+    }
+
+    body:has(.wa-live-chat) .back-to-top {
+        bottom: 92px;
+        right: 16px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .wa-float-btn,
+    .wa-float-ring,
+    .wa-float-btn__shadow,
+    .wa-chat-status-dot,
+    .wa-chat-header::before,
+    .wa-chat-bubble,
+    .wa-float-badge {
+        animation: none !important;
+    }
+
+    .wa-chat-panel {
+        transition-duration: 0.01ms;
+    }
+}
