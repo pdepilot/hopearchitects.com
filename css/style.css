@@ -74,18 +74,33 @@ h6,
 
 
 /*** Spinner ***/
+body.preloader-active {
+    overflow: hidden !important;
+    touch-action: none;
+}
+
 #spinner {
+    position: fixed !important;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    height: 100dvh;
+    min-height: 100vh;
+    min-height: -webkit-fill-available;
+    min-height: 100dvh;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
     opacity: 0;
     visibility: hidden;
     transition: opacity .5s ease-out, visibility 0s linear .5s;
     z-index: 99999;
     transform: none !important;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    margin: 0;
-    padding: 0;
-    overflow: hidden;
+    background: #000;
 }
 
 #spinner.show {
@@ -96,13 +111,44 @@ h6,
 
 .preloader-video {
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    top: 50%;
+    left: 50%;
+    min-width: 100%;
+    min-height: 100%;
+    width: auto;
+    height: auto;
     max-width: none;
+    transform: translate(-50%, -50%);
     object-fit: cover;
+    object-position: center center;
     display: block;
+    pointer-events: none;
+    background: #000;
+}
+
+@media (max-width: 991.98px) {
+    #spinner {
+        width: 100vw;
+        max-width: 100vw;
+    }
+
+    .preloader-video {
+        min-width: 100vw;
+        min-height: 100%;
+        min-height: 100dvh;
+        min-height: -webkit-fill-available;
+    }
+}
+
+@media (orientation: landscape) and (max-height: 500px) {
+    .preloader-video {
+        min-width: 100%;
+        min-height: 100vh;
+        min-height: 100dvh;
+        width: 100%;
+        height: 100%;
+        transform: translate(-50%, -50%) scale(1.02);
+    }
 }
 
 .brand-logo-video {

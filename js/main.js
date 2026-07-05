@@ -8,14 +8,33 @@
             return;
         }
 
+        var spinnerEl = document.getElementById('spinner');
         var hidden = false;
         var pageLoaded = false;
         var videoDone = false;
+
+        var syncSpinnerViewport = function () {
+            if (!spinnerEl || hidden) {
+                return;
+            }
+            spinnerEl.style.height = window.innerHeight + 'px';
+        };
+
+        $('body').addClass('preloader-active');
+        syncSpinnerViewport();
+        window.addEventListener('resize', syncSpinnerViewport);
+        window.addEventListener('orientationchange', function () {
+            window.setTimeout(syncSpinnerViewport, 150);
+        });
 
         var hideSpinner = function () {
             if (!hidden) {
                 hidden = true;
                 $spinner.removeClass('show');
+                $('body').removeClass('preloader-active');
+                if (spinnerEl) {
+                    spinnerEl.style.height = '';
+                }
             }
         };
 
